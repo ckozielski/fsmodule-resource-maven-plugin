@@ -1,5 +1,6 @@
 package com.espirit.ps.psci.moduleresourceplugin;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -79,6 +80,14 @@ public class GenerateModule extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException {
+		if (defaultConfiguration == null) {
+			defaultConfiguration = new DefaultConfiguration();
+		}
+
+		if (resources == null) {
+			resources = Collections.emptyList();
+		}
+
 		Set<String> components = collectComponents();
 		Map<String, String> values = createEmptyResources(components);
 
@@ -89,19 +98,18 @@ public class GenerateModule extends AbstractMojo {
 	}
 
 
-	private Set<String> collectComponents() {
+	protected Set<String> collectComponents() {
 		Set<String> components = new HashSet<>();
 		components.addAll(defaultConfiguration.getComponents());
 
 		for (ResourceConfiguration resourceConfiguration : resources) {
 			components.addAll(resourceConfiguration.getComponents());
 		}
-
 		return components;
 	}
 
 
-	private Map<String, String> createEmptyResources(Set<String> components) {
+	protected static Map<String, String> createEmptyResources(Set<String> components) {
 		Map<String, String> emptyValues = new TreeMap<>();
 		for (String component : components) {
 			String legacyComponent = String.format("%s.legacy", component);

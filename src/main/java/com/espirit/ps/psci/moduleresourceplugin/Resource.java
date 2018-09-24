@@ -22,7 +22,7 @@ public class Resource {
 
 	@Override
 	public String toString() {
-		return String.format("resource [identifier: %s, scope:%s, isolated:%s, version: %s, path: %s, filename:%s]", identifier, getScope(false), getIsolated(false, false), getVersion(), getPath(), filename);
+		return String.format("resource [identifier: %s, scope: %s, isolated: %s, version: %s, path: %s, filename:%s]", identifier, getScope(false), getIsolated(false, false), getVersion(), getPath(), filename);
 	}
 
 
@@ -45,7 +45,7 @@ public class Resource {
 	}
 
 
-	private String getIsolated(boolean isWeb, boolean isIsolated) {
+	private String getIsolated(Boolean isWeb, Boolean isIsolated) {
 		if (isWeb || !isIsolated) {
 			return "";
 		}

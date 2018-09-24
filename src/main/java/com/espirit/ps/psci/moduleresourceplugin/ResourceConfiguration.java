@@ -40,13 +40,16 @@ public class ResourceConfiguration {
 		if (components == null) {
 			return Collections.emptySet();
 		}
+
 		if (!components.contains(",")) {
 			return Collections.singleton(components);
 		}
 
 		Set<String> componentSet = new HashSet<>();
 		for (String component : components.split(",")) {
-			componentSet.add(component.trim());
+			if (component.trim().length() > 0) {
+				componentSet.add(component.trim());
+			}
 		}
 		return componentSet;
 	}
