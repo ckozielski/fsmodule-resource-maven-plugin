@@ -1,83 +1,108 @@
 package com.espirit.ps.psci.moduleresourceplugin;
 
-import org.apache.maven.artifact.Artifact;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import org.apache.maven.plugins.annotations.Parameter;
 
 public class Resource {
 
-	private final String identifier;
-	private final DefaultConfiguration defaultConfiguration;
-	private final ResourceConfiguration resourceConfiguration;
-	private String filename;
-	private String version;
+	@Parameter(required = true)
+	private String identifier;
+
+	@Parameter
+	private String scope;
+
+	@Parameter
+	private String components;
+
+	@Parameter
+	private Boolean isolated;
+
+	@Parameter
+	private boolean exclude;
+
+	@Parameter
+	private String path;
+
+	@Parameter
+	private String minVersion;
+
+	@Parameter
+	private String maxVersion;
 
 
-	public Resource(Artifact artifact, DefaultConfiguration configuration, ResourceConfiguration resourceConfiguration) {
-		this.defaultConfiguration = configuration;
-		this.resourceConfiguration = resourceConfiguration;
-		identifier = String.format("%s:%s", artifact.getGroupId(), artifact.getArtifactId());
-		filename = artifact.getFile().getName();
-		version = artifact.getVersion();
+	@Override
+	public int hashCode() {
+		return identifier.hashCode();
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Resource)) {
+			return super.equals(obj);
+		}
+		return identifier.equals(((Resource) obj).identifier);
+	}
+
+
+	public String getIdentifier() {
+		return identifier;
+	}
+
+
+	public String getScope() {
+		return scope;
+	}
+
+
+	public void setScope(String scope) {
+		this.scope = scope;
+	}
+
+
+	public Set<String> getComponents() {
+		if (components == null) {
+			return Collections.emptySet();
+		}
+
+		if (!components.contains(",")) {
+			return Collections.singleton(components);
+		}
+
+		Set<String> componentSet = new HashSet<>();
+		for (String component : components.split(",")) {
+			if (component.trim().length() > 0) {
+				componentSet.add(component.trim());
+			}
+		}
+		return componentSet;
+	}
+
+
+	public Boolean isIsolated() {
+		return isolated;
+	}
+
+
+	public String getPath() {
+		return path;
+	}
+
+
+	public String getMinVersion() {
+		return minVersion;
+	}
+
+
+	public String getMaxVersion() {
+		return maxVersion;
 	}
 
 
 	@Override
 	public String toString() {
-		return String.format("resource [identifier: %s, scope: %s, isolated: %s, version: %s, path: %s, filename:%s]", identifier, getScope(false), getIsolated(false, false), getVersion(), getPath(), filename);
-	}
-
-
-	public String getResourceString(String component, boolean isWeb, boolean isIsolated) {
-		boolean allowed = false;
-		if (resourceConfiguration != null && !resourceConfiguration.getComponents().isEmpty()) {
-			allowed = resourceConfiguration.getComponents().contains(component);
-		} else {
-			allowed = defaultConfiguration.getComponents().contains(component);
-		}
-		if (allowed) {
-			return String.format("<resource name=\"%s\"%s%s%s>%s%s</resource>%n", identifier, getScope(isWeb), getIsolated(isWeb, isIsolated), getVersion(), getPath(), filename);
-		}
-		return null;
-	}
-
-
-	private String getVersion() {
-		return String.format(" version=\"%s\"", version);
-	}
-
-
-	private String getIsolated(Boolean isWeb, Boolean isIsolated) {
-		if (isWeb || !isIsolated) {
-			return "";
-		}
-		boolean isolated;
-		if (resourceConfiguration != null && resourceConfiguration.isIsolated() != null) {
-			isolated = resourceConfiguration.isIsolated();
-		} else {
-			isolated = defaultConfiguration.isIsolated();
-		}
-		return String.format(" isolated=\"%s\"", isolated);
-	}
-
-
-	private String getScope(boolean isWeb) {
-		if (isWeb) {
-			return "";
-		}
-		String scope;
-		if (resourceConfiguration != null && resourceConfiguration.getScope() != null) {
-			scope = resourceConfiguration.getScope();
-		} else {
-			scope = defaultConfiguration.getScope();
-		}
-		return String.format(" scope=\"%s\"", scope);
-	}
-
-
-	private String getPath() {
-		if (resourceConfiguration != null && resourceConfiguration.getPath() != null) {
-			return resourceConfiguration.getPath();
-		} else {
-			return defaultConfiguration.getPath();
-		}
+		return String.format("resource [identifier: %s, scope: %s, components: %s, exclude: %s, path: %s, minVersion: %s, maxVersion: %s]", identifier, scope, components, exclude, path, minVersion, maxVersion);
 	}
 }
