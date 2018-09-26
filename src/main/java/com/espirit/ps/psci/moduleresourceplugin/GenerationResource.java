@@ -99,7 +99,7 @@ public class GenerationResource {
 		boolean allowed = false;
 		if ("".equals(filename) && resourceConfiguration.getPath() == null) {
 			allowed = false;
-		} else if (!isIsolated && resourceConfiguration.isExluded()) {
+		} else if (!isIsolated && resourceConfiguration != null && resourceConfiguration.isExluded()) {
 			allowed = false;
 		} else if (resourceConfiguration != null && !resourceConfiguration.getComponents().isEmpty()) {
 			allowed = resourceConfiguration.getComponents().contains(component);

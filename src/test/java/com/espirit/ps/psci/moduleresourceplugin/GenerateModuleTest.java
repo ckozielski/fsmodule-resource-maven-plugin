@@ -42,13 +42,15 @@ public class GenerateModuleTest {
 		Assert.assertTrue(emptyResources.isEmpty());
 
 		emptyResources = GenerateModule.createEmptyResources(Collections.singleton("global"));
-		Assert.assertEquals(3, emptyResources.size());
+		Assert.assertEquals(4, emptyResources.size());
 		Assert.assertTrue(emptyResources.containsKey("global.isolated"));
 		Assert.assertEquals("", emptyResources.get("global.isolated"));
 		Assert.assertTrue(emptyResources.containsKey("global.legacy"));
 		Assert.assertEquals("", emptyResources.get("global.legacy"));
-		Assert.assertTrue(emptyResources.containsKey("global.web"));
-		Assert.assertEquals("", emptyResources.get("global.web"));
+		Assert.assertTrue(emptyResources.containsKey("global.legacy.web"));
+		Assert.assertEquals("", emptyResources.get("global.legacy.web"));
+		Assert.assertTrue(emptyResources.containsKey("global.isolated.web"));
+		Assert.assertEquals("", emptyResources.get("global.isolated.web"));
 		// GenerateModule generateModule = new GenerateModule();
 		// Map<String, String> emptyValues = new TreeMap<>();
 		// for (String component : components) {
