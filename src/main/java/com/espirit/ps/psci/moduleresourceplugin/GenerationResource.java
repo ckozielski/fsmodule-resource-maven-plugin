@@ -64,10 +64,13 @@ public class GenerationResource {
 
 
 	private String getMinVersion() {
-		if (resourceConfiguration != null && resourceConfiguration.getMinVersion() != null) {
+		if (resourceConfiguration != null && resourceConfiguration.getMinVersion() != null && resourceConfiguration.getMinVersion().trim().length() > 0) {
 			return String.format(" minVersion=\"%s\"", resourceConfiguration.getMinVersion());
+		} else if (defaultConfiguration.useDefaultMinVersion()) {
+			return String.format(" minVersion=\"%s\"", version);
+		} else {
+			return "";
 		}
-		return "";
 	}
 
 

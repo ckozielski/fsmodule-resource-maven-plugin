@@ -11,6 +11,7 @@ public class DefaultConfiguration {
 	private static final Set<String> DEFAULT_COMPONENTS = Collections.singleton("global");
 	private static final boolean DEFAULT_ISOLATED = true;
 	private static final String DEFAULT_PATH = "lib/";
+	private static final boolean DEFAULT_MIN_VERSION = true;
 
 	@Parameter
 	private String scope;
@@ -23,6 +24,9 @@ public class DefaultConfiguration {
 
 	@Parameter
 	private String path;
+
+	@Parameter
+	private Boolean useDefaultMinVersion;
 
 
 	public String getScope() {
@@ -67,6 +71,14 @@ public class DefaultConfiguration {
 			return DEFAULT_PATH;
 		}
 		return path;
+	}
+
+
+	public boolean useDefaultMinVersion() {
+		if (useDefaultMinVersion == null) {
+			return DEFAULT_MIN_VERSION;
+		}
+		return useDefaultMinVersion;
 	}
 
 

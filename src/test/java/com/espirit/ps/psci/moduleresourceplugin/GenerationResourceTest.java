@@ -25,17 +25,17 @@ public class GenerationResourceTest {
 	public void getResourceString() {
 		GenerationResource resource;
 		resource = new GenerationResource(artifact, new DefaultConfiguration(), null);
-		Assert.assertEquals(String.format("<resource name=\"groupId:artifactId\" scope=\"module\" version=\"0.8.15\">lib/filename.ext</resource>%n"), resource.getResourceString("global", false, false));
-		Assert.assertEquals(String.format("<resource name=\"groupId:artifactId\" version=\"0.8.15\">lib/filename.ext</resource>%n"), resource.getResourceString("global", true, true));
+		Assert.assertEquals(String.format("<resource name=\"groupId:artifactId\" scope=\"module\" version=\"0.8.15\" minVersion=\"0.8.15\">lib/filename.ext</resource>%n"), resource.getResourceString("global", false, false));
+		Assert.assertEquals(String.format("<resource name=\"groupId:artifactId\" version=\"0.8.15\" minVersion=\"0.8.15\">lib/filename.ext</resource>%n"), resource.getResourceString("global", true, true));
 
 		Assert.assertNull(resource.getResourceString("hurz", false, false));
 
 		Resource resourceConfiguration = new Resource();
 		resource = new GenerationResource(artifact, new DefaultConfiguration(), resourceConfiguration);
-		Assert.assertEquals(String.format("<resource name=\"groupId:artifactId\" scope=\"module\" version=\"0.8.15\">lib/filename.ext</resource>%n"), resource.getResourceString("global", false, false));
+		Assert.assertEquals(String.format("<resource name=\"groupId:artifactId\" scope=\"module\" version=\"0.8.15\" minVersion=\"0.8.15\">lib/filename.ext</resource>%n"), resource.getResourceString("global", false, false));
 
 		TestHelper.injectToPrivateField(resourceConfiguration, "components", "global");
-		Assert.assertEquals(String.format("<resource name=\"groupId:artifactId\" scope=\"module\" version=\"0.8.15\">lib/filename.ext</resource>%n"), resource.getResourceString("global", false, false));
+		Assert.assertEquals(String.format("<resource name=\"groupId:artifactId\" scope=\"module\" version=\"0.8.15\" minVersion=\"0.8.15\">lib/filename.ext</resource>%n"), resource.getResourceString("global", false, false));
 	}
 
 
