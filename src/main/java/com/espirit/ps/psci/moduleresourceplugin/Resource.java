@@ -1,6 +1,5 @@
 package com.espirit.ps.psci.moduleresourceplugin;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -15,6 +14,7 @@ public class Resource {
 
 	@Parameter
 	private String components;
+	private Set<String> componentSet;
 
 	@Parameter
 	private Boolean isolated;
@@ -63,18 +63,21 @@ public class Resource {
 
 
 	public Set<String> getComponents() {
-		if (components == null) {
-			return Collections.emptySet();
-		}
+		if (componentSet == null) {
+			componentSet = new HashSet<>();
 
-		if (!components.contains(",")) {
-			return Collections.singleton(components);
-		}
+			if (components == null) {
+				return componentSet;
+			}
+			if (!components.contains(",")) {
+				componentSet.add(components);
+				return componentSet;
+			}
 
-		Set<String> componentSet = new HashSet<>();
-		for (String component : components.split(",")) {
-			if (component.trim().length() > 0) {
-				componentSet.add(component.trim());
+			for (String component : components.split(",")) {
+				if (component.trim().length() > 0) {
+					componentSet.add(component.trim());
+				}
 			}
 		}
 		return componentSet;

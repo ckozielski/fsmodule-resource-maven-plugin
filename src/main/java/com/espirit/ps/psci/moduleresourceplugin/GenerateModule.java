@@ -72,6 +72,7 @@ public class GenerateModule extends AbstractMojo {
 	/**
 	 * Own configuration
 	 */
+	@Parameter
 	private List<Resource> resources;
 
 	@Parameter
