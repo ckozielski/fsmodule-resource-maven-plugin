@@ -1,5 +1,6 @@
 package com.espirit.ps.psci.moduleresourceplugin;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -71,8 +72,7 @@ public class GenerateModule extends AbstractMojo {
 	/**
 	 * Own configuration
 	 */
-	@Parameter(name = "resources")
-	private List<ResourceConfiguration> resources;
+	private List<Resource> resources;
 
 	@Parameter
 	private DefaultConfiguration defaultConfiguration;
@@ -102,7 +102,7 @@ public class GenerateModule extends AbstractMojo {
 		Set<String> components = new HashSet<>();
 		components.addAll(defaultConfiguration.getComponents());
 
-		for (ResourceConfiguration resourceConfiguration : resources) {
+		for (Resource resourceConfiguration : resources) {
 			components.addAll(resourceConfiguration.getComponents());
 		}
 		return components;
@@ -126,7 +126,7 @@ public class GenerateModule extends AbstractMojo {
 	private void fillResources(Set<String> components, Map<String, String> values) throws MojoExecutionException {
 		try {
 			for (String component : components) {
-				for (Resource resource : getResources()) {
+				for (GenerationResource resource : getResources()) {
 					processResource(resource, component, values, false, false);
 					processResource(resource, component, values, false, true);
 					processResource(resource, component, values, true, true);
@@ -138,8 +138,8 @@ public class GenerateModule extends AbstractMojo {
 	}
 
 
-	private Set<Resource> getResources() throws DependencyGraphBuilderException {
-		Set<Resource> modulResources = new HashSet<>();
+	private List<GenerationResource> getResources() throws DependencyGraphBuilderException, MojoExecutionException {
+		List<GenerationResource> modulResources = new ArrayList<>();
 		final ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(this.session.getProjectBuildingRequest());
 		buildingRequest.setProject(this.project);
 
@@ -150,23 +150,12 @@ public class GenerateModule extends AbstractMojo {
 				continue;
 			}
 
-			ResourceConfiguration configuration = getResourceConfiguration(rootArtifact);
+			Resource configuration = getResourceConfiguration(rootArtifact);
 			CollectingDependencyNodeVisitor visitor = new CollectingDependencyNodeVisitor();
 			dependencyNode.accept(visitor);
 
 			for (DependencyNode childDependencyNode : visitor.getNodes()) {
-				Artifact artifact = childDependencyNode.getArtifact();
-
-				if ("provided".equals(artifact.getScope()) || "test".equals(artifact.getScope())) {
-					continue;
-				}
-
-				ResourceConfiguration childConfiguration = getResourceConfiguration(artifact);
-				if (childConfiguration == null) {
-					childConfiguration = configuration;
-				}
-
-				modulResources.add(new Resource(artifact, defaultConfiguration, childConfiguration));
+				processDependency(modulResources, configuration, childDependencyNode);
 			}
 		}
 
@@ -174,7 +163,36 @@ public class GenerateModule extends AbstractMojo {
 	}
 
 
-	private void processResource(Resource resource, String component, Map<String, String> values, boolean isWeb, boolean isIsolated) {
+	private void processDependency(List<GenerationResource> modulResources, Resource configuration, DependencyNode childDependencyNode) throws MojoExecutionException {
+		Artifact artifact = childDependencyNode.getArtifact();
+
+		if ("provided".equals(artifact.getScope()) || "test".equals(artifact.getScope())) {
+			return;
+		}
+
+		Resource childConfiguration = getResourceConfiguration(artifact);
+		if (childConfiguration == null) {
+			childConfiguration = configuration;
+		}
+
+		GenerationResource resource = new GenerationResource(artifact, defaultConfiguration, childConfiguration);
+		if (!modulResources.contains(resource)) {
+			modulResources.add(resource);
+			return;
+		}
+
+		GenerationResource generationResource = modulResources.get(modulResources.indexOf(resource));
+		try {
+			generationResource.merge(resource);
+		} catch (DifferenScopeException e) {
+			this.getLog().warn(e.getMessage(), e);
+		} catch (Exception e) {
+			throw new MojoExecutionException("error while collecting dependencies", e);
+		}
+	}
+
+
+	private void processResource(GenerationResource resource, String component, Map<String, String> values, boolean isWeb, boolean isIsolated) {
 		String resourceString = resource.getResourceString(component, isWeb, isIsolated);
 		if (resourceString != null) {
 			String componentKey;
@@ -193,14 +211,17 @@ public class GenerateModule extends AbstractMojo {
 	private void fillProjectProperties(Map<String, String> values) {
 		for (Entry<String, String> entry : values.entrySet()) {
 			project.getProperties().put("module.resources." + entry.getKey(), entry.getValue());
+			if (this.getLog().isDebugEnabled()) {
+				this.getLog().debug(String.format("module.resources.%s:%n%s", entry.getKey(), entry.getValue()));
+			}
 		}
 	}
 
 
-	private ResourceConfiguration getResourceConfiguration(Artifact artifact) {
+	private Resource getResourceConfiguration(Artifact artifact) {
 		String identifier = String.format("%s:%s", artifact.getGroupId(), artifact.getArtifactId());
 
-		for (ResourceConfiguration resourceConfiguration : resources) {
+		for (Resource resourceConfiguration : resources) {
 			if (identifier.equals(resourceConfiguration.getIdentifier())) {
 				return resourceConfiguration;
 			}
@@ -216,7 +237,7 @@ public class GenerateModule extends AbstractMojo {
 			this.getLog().debug("additional resource configurations:");
 			if (!resources.isEmpty()) {
 				this.getLog().debug("-----");
-				for (ResourceConfiguration resourceConfiguration : resources) {
+				for (Resource resourceConfiguration : resources) {
 					this.getLog().debug(resourceConfiguration.toString());
 				}
 				this.getLog().debug("-----");

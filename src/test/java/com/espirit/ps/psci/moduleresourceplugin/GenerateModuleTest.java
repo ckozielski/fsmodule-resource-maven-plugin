@@ -28,7 +28,7 @@ public class GenerateModuleTest {
 		Assert.assertFalse(generateModule.collectComponents().isEmpty());
 
 		TestHelper.injectToPrivateField(defaultConfiguration, "components", "");
-		ResourceConfiguration resourceConfiguration = new ResourceConfiguration();
+		Resource resourceConfiguration = new Resource();
 		TestHelper.injectToPrivateField(generateModule, "resources", Collections.singletonList(resourceConfiguration));
 		Assert.assertTrue(generateModule.collectComponents().isEmpty());
 	}
