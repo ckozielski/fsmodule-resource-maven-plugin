@@ -97,7 +97,7 @@ public class GenerationResource {
 
 	public String getResourceString(String component, boolean isWeb, boolean isIsolated) {
 		boolean allowed = false;
-		if ("".equals(filename) && resourceConfiguration.getPath() == null) {
+		if ("".equals(filename) && resourceConfiguration != null && resourceConfiguration.getPath() == null) {
 			allowed = false;
 		} else if (!isIsolated && resourceConfiguration != null && resourceConfiguration.isExluded()) {
 			allowed = false;
