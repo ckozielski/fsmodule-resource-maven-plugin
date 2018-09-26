@@ -23,19 +23,23 @@ public class ResourceTest {
 
 	@Test
 	public void getComponentsTest() {
-		Resource resourceConfiguration = new Resource();
+		Resource resourceConfiguration;
+		resourceConfiguration = new Resource();
 
 		TestHelper.injectToPrivateField(resourceConfiguration, "components", null);
 		Assert.assertTrue(resourceConfiguration.getComponents().isEmpty());
 
+		resourceConfiguration = new Resource();
 		TestHelper.injectToPrivateField(resourceConfiguration, "components", "");
 		Assert.assertEquals(1, resourceConfiguration.getComponents().size());
 		Assert.assertTrue(resourceConfiguration.getComponents().contains(""));
 
+		resourceConfiguration = new Resource();
 		TestHelper.injectToPrivateField(resourceConfiguration, "components", "global");
 		Assert.assertEquals(1, resourceConfiguration.getComponents().size());
 		Assert.assertTrue(resourceConfiguration.getComponents().contains("global"));
 
+		resourceConfiguration = new Resource();
 		TestHelper.injectToPrivateField(resourceConfiguration, "components", "global,,web");
 		Assert.assertEquals(2, resourceConfiguration.getComponents().size());
 		Assert.assertTrue(resourceConfiguration.getComponents().contains("global"));
