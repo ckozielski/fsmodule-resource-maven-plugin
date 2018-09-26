@@ -127,7 +127,8 @@ public class GenerateModule extends AbstractMojo {
 	private void fillResources(Set<String> components, Map<String, String> values) throws MojoExecutionException {
 		try {
 			for (String component : components) {
-				for (GenerationResource resource : getResources()) {
+				List<GenerationResource> collectedResources = getResources();
+				for (GenerationResource resource : collectedResources) {
 					processResource(resource, component, values, false, false);
 					processResource(resource, component, values, false, true);
 					processResource(resource, component, values, true, true);
@@ -145,6 +146,10 @@ public class GenerateModule extends AbstractMojo {
 		buildingRequest.setProject(this.project);
 
 		final DependencyNode rootNode = this.dependencyGraphBuilder.buildDependencyGraph(buildingRequest, null, this.reactorProjects);
+
+		Resource rootNodeConfiguration = getResourceConfiguration(rootNode.getArtifact());
+		processDependency(modulResources, rootNodeConfiguration, rootNode);
+
 		for (DependencyNode dependencyNode : rootNode.getChildren()) {
 			Artifact rootArtifact = dependencyNode.getArtifact();
 			if ("provided".equals(rootArtifact.getScope()) || "test".equals(rootArtifact.getScope())) {

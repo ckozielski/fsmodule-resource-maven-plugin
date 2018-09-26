@@ -15,7 +15,11 @@ public class GenerationResource {
 		this.defaultConfiguration = configuration;
 		this.resourceConfiguration = resourceConfiguration;
 		identifier = String.format("%s:%s", artifact.getGroupId(), artifact.getArtifactId());
-		filename = artifact.getFile().getName();
+		if (artifact.getFile() != null) {
+			this.filename = artifact.getFile().getName();
+		} else {
+			this.filename = "";
+		}
 		version = artifact.getVersion();
 	}
 
@@ -93,7 +97,11 @@ public class GenerationResource {
 
 	public String getResourceString(String component, boolean isWeb, boolean isIsolated) {
 		boolean allowed = false;
-		if (resourceConfiguration != null && !resourceConfiguration.getComponents().isEmpty()) {
+		if ("".equals(filename) && resourceConfiguration.getPath() == null) {
+			allowed = false;
+		} else if (!isIsolated && resourceConfiguration.isExluded()) {
+			allowed = false;
+		} else if (resourceConfiguration != null && !resourceConfiguration.getComponents().isEmpty()) {
 			allowed = resourceConfiguration.getComponents().contains(component);
 		} else {
 			allowed = defaultConfiguration.getComponents().contains(component);

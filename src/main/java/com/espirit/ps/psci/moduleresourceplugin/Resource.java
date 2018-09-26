@@ -89,6 +89,11 @@ public class Resource {
 	}
 
 
+	public boolean isExluded() {
+		return exclude;
+	}
+
+
 	public String getPath() {
 		return path;
 	}
