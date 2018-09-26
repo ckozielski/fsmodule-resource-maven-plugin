@@ -50,11 +50,6 @@
 			<version>3.3</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.maven.shared</groupId>
-			<artifactId>maven-dependency-tree</artifactId>
-			<version>3.0.1</version>
-		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.shared/maven-dependency-tree -->
 		<dependency>
 			<groupId>org.apache.maven.shared</groupId>
@@ -156,7 +151,7 @@
 				<artifactId>maven-plugin-plugin</artifactId>
 				<version>3.3</version>
 				<configuration>
-					<goalPrefix>module-resource-plugin</goalPrefix>
+					<goalPrefix>module-resource</goalPrefix>
 					<skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
 				</configuration>
 				<executions>
