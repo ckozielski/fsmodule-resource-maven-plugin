@@ -117,8 +117,10 @@ public class GenerateModule extends AbstractMojo {
 			emptyValues.put(legacyComponent, "");
 			String isolatedComponent = String.format("%s.isolated", component);
 			emptyValues.put(isolatedComponent, "");
-			String webComponent = String.format("%s.web", component);
-			emptyValues.put(webComponent, "");
+			String legacyWebComponent = String.format("%s.legacy.web", component);
+			emptyValues.put(legacyWebComponent, "");
+			String isolatedWebComponent = String.format("%s.isolated.web", component);
+			emptyValues.put(isolatedWebComponent, "");
 		}
 		return emptyValues;
 	}
@@ -131,6 +133,7 @@ public class GenerateModule extends AbstractMojo {
 				for (GenerationResource resource : collectedResources) {
 					processResource(resource, component, values, false, false);
 					processResource(resource, component, values, false, true);
+					processResource(resource, component, values, true, false);
 					processResource(resource, component, values, true, true);
 				}
 			}
@@ -202,9 +205,11 @@ public class GenerateModule extends AbstractMojo {
 		String resourceString = resource.getResourceString(component, isWeb, isIsolated);
 		if (resourceString != null) {
 			String componentKey;
-			if (isWeb) {
-				componentKey = String.format("%s.web", component);
-			} else if (isIsolated) {
+			if (isWeb && isIsolated) {
+				componentKey = String.format("%s.isolated.web", component);
+			} else if (isWeb && !isIsolated) {
+				componentKey = String.format("%s.legacy.web", component);
+			} else if (!isWeb && isIsolated) {
 				componentKey = String.format("%s.isolated", component);
 			} else {
 				componentKey = String.format("%s.legacy", component);
