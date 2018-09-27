@@ -145,7 +145,6 @@ public class GenerateModule extends AbstractMojo {
 					processResource(resource, component, values, false, true);
 					processResource(resource, component, values, true, false);
 					processResource(resource, component, values, true, true);
-					processOldResource(resource, values);
 				}
 			}
 			for (GenerationResource resource : collectedResources) {
