@@ -53,14 +53,14 @@ public class GenerateModuleTest {
 
 		emptyResources = GenerateModule.createEmptyResources(Collections.singleton("global"));
 		Assert.assertEquals(7, emptyResources.size());
-		Assert.assertTrue(emptyResources.containsKey("global.isolated"));
-		Assert.assertEquals("", emptyResources.get("global.isolated"));
-		Assert.assertTrue(emptyResources.containsKey("global.legacy"));
-		Assert.assertEquals("", emptyResources.get("global.legacy"));
-		Assert.assertTrue(emptyResources.containsKey("global.legacy.web"));
-		Assert.assertEquals("", emptyResources.get("global.legacy.web"));
-		Assert.assertTrue(emptyResources.containsKey("global.isolated.web"));
-		Assert.assertEquals("", emptyResources.get("global.isolated.web"));
+		Assert.assertTrue(emptyResources.containsKey("module.resources.global.isolated"));
+		Assert.assertEquals("", emptyResources.get("module.resources.global.isolated"));
+		Assert.assertTrue(emptyResources.containsKey("module.resources.global.legacy"));
+		Assert.assertEquals("", emptyResources.get("module.resources.global.legacy"));
+		Assert.assertTrue(emptyResources.containsKey("module.resources.global.legacy.web"));
+		Assert.assertEquals("", emptyResources.get("module.resources.global.legacy.web"));
+		Assert.assertTrue(emptyResources.containsKey("module.resources.global.isolated.web"));
+		Assert.assertEquals("", emptyResources.get("module.resources.global.isolated.web"));
 		Assert.assertTrue(emptyResources.containsKey("resources"));
 		Assert.assertEquals("", emptyResources.get("resources"));
 		Assert.assertTrue(emptyResources.containsKey("resourcesModule"));
@@ -116,18 +116,18 @@ public class GenerateModuleTest {
 
 		values = (Map<String, String>) TestHelper.invokePrivateMethod(generateModule, "createEmptyResources", Collections.singleton("global"));
 		TestHelper.invokePrivateMethod(generateModule, "processResource", resource, "global", values, false, false);
-		Assert.assertFalse("".equals(values.get("global.legacy")));
+		Assert.assertFalse("".equals(values.get("module.resources.global.legacy")));
 		TestHelper.invokePrivateMethod(generateModule, "processResource", resource, "global", values, false, true);
-		Assert.assertFalse("".equals(values.get("global.isolated")));
+		Assert.assertFalse("".equals(values.get("module.resources.global.isolated")));
 		TestHelper.invokePrivateMethod(generateModule, "processResource", resource, "global", values, true, false);
-		Assert.assertFalse("".equals(values.get("global.legacy.web")));
+		Assert.assertFalse("".equals(values.get("module.resources.global.legacy.web")));
 		TestHelper.invokePrivateMethod(generateModule, "processResource", resource, "global", values, true, true);
-		Assert.assertFalse("".equals(values.get("global.isolated.web")));
+		Assert.assertFalse("".equals(values.get("module.resources.global.isolated.web")));
 
 		values = (Map<String, String>) TestHelper.invokePrivateMethod(generateModule, "createEmptyResources", Collections.singleton("global"));
 		resource = new GenerationResource(TestHelper.createArtifact(null), new DefaultConfiguration(), null);
 		TestHelper.invokePrivateMethod(generateModule, "processResource", resource, "global", values, true, true);
-		Assert.assertEquals("", values.get("global.isolated.web"));
+		Assert.assertEquals("", values.get("module.resources.global.isolated.web"));
 	}
 
 

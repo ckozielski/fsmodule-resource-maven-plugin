@@ -123,13 +123,13 @@ public class GenerateModule extends AbstractMojo {
 		emptyValues.put(VAR_NAME_RESOURCES_RUNTIME, "");
 
 		for (String component : components) {
-			String legacyComponent = String.format("%s.legacy", component);
+			String legacyComponent = String.format("module.resources.%s.legacy", component);
 			emptyValues.put(legacyComponent, "");
-			String isolatedComponent = String.format("%s.isolated", component);
+			String isolatedComponent = String.format("module.resources.%s.isolated", component);
 			emptyValues.put(isolatedComponent, "");
-			String legacyWebComponent = String.format("%s.legacy.web", component);
+			String legacyWebComponent = String.format("module.resources.%s.legacy.web", component);
 			emptyValues.put(legacyWebComponent, "");
-			String isolatedWebComponent = String.format("%s.isolated.web", component);
+			String isolatedWebComponent = String.format("module.resources.%s.isolated.web", component);
 			emptyValues.put(isolatedWebComponent, "");
 		}
 		return emptyValues;
@@ -138,8 +138,8 @@ public class GenerateModule extends AbstractMojo {
 
 	private void fillResources(Set<String> components, Map<String, String> values) throws MojoExecutionException {
 		try {
+			Set<GenerationResource> collectedResources = getResources();
 			for (String component : components) {
-				Set<GenerationResource> collectedResources = getResources();
 				for (GenerationResource resource : collectedResources) {
 					processResource(resource, component, values, false, false);
 					processResource(resource, component, values, false, true);
@@ -147,6 +147,9 @@ public class GenerateModule extends AbstractMojo {
 					processResource(resource, component, values, true, true);
 					processOldResource(resource, values);
 				}
+			}
+			for (GenerationResource resource : collectedResources) {
+				processOldResource(resource, values);
 			}
 		} catch (DependencyGraphBuilderException e) {
 			throw new MojoExecutionException("error while collecting dependencies", e);
@@ -205,15 +208,15 @@ public class GenerateModule extends AbstractMojo {
 			String componentKey;
 			if (isWeb) {
 				if (isIsolated) {
-					componentKey = String.format("%s.isolated.web", component);
+					componentKey = String.format("module.resources.%s.isolated.web", component);
 				} else {
-					componentKey = String.format("%s.legacy.web", component);
+					componentKey = String.format("module.resources.%s.legacy.web", component);
 				}
 			} else {
 				if (isIsolated) {
-					componentKey = String.format("%s.isolated", component);
+					componentKey = String.format("module.resources.%s.isolated", component);
 				} else {
-					componentKey = String.format("%s.legacy", component);
+					componentKey = String.format("module.resources.%s.legacy", component);
 				}
 			}
 			values.put(componentKey, values.get(componentKey) + resourceString);
@@ -237,9 +240,9 @@ public class GenerateModule extends AbstractMojo {
 
 	private void fillProjectProperties(Map<String, String> values) {
 		for (Entry<String, String> entry : values.entrySet()) {
-			project.getProperties().put("module.resources." + entry.getKey(), entry.getValue());
+			project.getProperties().put(entry.getKey(), entry.getValue());
 			if (this.getLog().isDebugEnabled()) {
-				this.getLog().debug(String.format("module.resources.%s:%n%s", entry.getKey(), entry.getValue()));
+				this.getLog().debug(String.format("%s:%n%s", entry.getKey(), entry.getValue()));
 			}
 		}
 	}
