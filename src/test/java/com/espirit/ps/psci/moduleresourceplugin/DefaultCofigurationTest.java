@@ -9,6 +9,7 @@ public class DefaultCofigurationTest {
 	private static final Object DEFAULT_ISOLATED = TestHelper.getPrivateField(new DefaultConfiguration(), "DEFAULT_ISOLATED");
 	private static final Object DEFAULT_COMPONENTS = TestHelper.getPrivateField(new DefaultConfiguration(), "DEFAULT_COMPONENTS");
 	private static final Object DEFAULT_PATH = TestHelper.getPrivateField(new DefaultConfiguration(), "DEFAULT_PATH");
+	private static final Object DEFAULT_MIN_VERSION = TestHelper.getPrivateField(new DefaultConfiguration(), "DEFAULT_MIN_VERSION");
 
 
 	@Test
@@ -74,6 +75,23 @@ public class DefaultCofigurationTest {
 	public void toStringTest() {
 		DefaultConfiguration defaultConfiguration = new DefaultConfiguration();
 		Assert.assertEquals(String.format("default [scope: %s, isolated: %s, path: %s, components: %s]", DEFAULT_SCOPE, DEFAULT_ISOLATED, DEFAULT_PATH, DEFAULT_COMPONENTS), defaultConfiguration.toString());
+	}
+
+
+	@Test
+	public void useDefaultMinVersionTest() {
+		DefaultConfiguration defaultConfiguration;
+
+		defaultConfiguration = new DefaultConfiguration();
+		Assert.assertEquals(DEFAULT_MIN_VERSION, defaultConfiguration.useDefaultMinVersion());
+
+		defaultConfiguration = new DefaultConfiguration();
+		TestHelper.injectToPrivateField(defaultConfiguration, "useDefaultMinVersion", Boolean.FALSE);
+		Assert.assertEquals(Boolean.FALSE, defaultConfiguration.useDefaultMinVersion());
+
+		defaultConfiguration = new DefaultConfiguration();
+		TestHelper.injectToPrivateField(defaultConfiguration, "useDefaultMinVersion", Boolean.TRUE);
+		Assert.assertEquals(Boolean.TRUE, defaultConfiguration.useDefaultMinVersion());
 	}
 
 }

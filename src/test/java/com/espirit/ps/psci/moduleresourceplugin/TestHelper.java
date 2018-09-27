@@ -1,8 +1,11 @@
 package com.espirit.ps.psci.moduleresourceplugin;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import org.apache.maven.artifact.Artifact;
+import org.mockito.Mockito;
 
 public class TestHelper {
 
@@ -122,5 +125,57 @@ public class TestHelper {
 			}
 		}
 		throw new RuntimeException(String.format("unable to invoke method [name: %s]", methodName));
+	}
+
+
+	public static Object invokePrivateMethod(Object element, String methodName, Object arg1, Object arg2, Object arg3) {
+		Method[] methods = element.getClass().getDeclaredMethods();
+
+		for (Method method : methods) {
+			if (method.getName().equals(methodName) && method.getParameterCount() == 3) {
+				method.setAccessible(true);
+				try {
+					return method.invoke(element, method.getParameters()[0].getType().cast(arg1), method.getParameters()[1].getType().cast(arg2), method.getParameters()[2].getType().cast(arg3));
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					throw new RuntimeException(String.format("unable to invoke method [name: %s]", e, methodName));
+				}
+			}
+		}
+		throw new RuntimeException(String.format("unable to invoke method [name: %s]", methodName));
+	}
+
+
+	public static Object invokePrivateMethod(Object element, String methodName, Object arg1, Object arg2, Object arg3, Object arg4, Object arg5) {
+		Method[] methods = element.getClass().getDeclaredMethods();
+
+		for (Method method : methods) {
+			if (method.getName().equals(methodName) && method.getParameterCount() == 5) {
+				method.setAccessible(true);
+				try {
+					return method.invoke(element, method.getParameters()[0].getType().cast(arg1), method.getParameters()[1].getType().cast(arg2), method.getParameters()[2].getType().cast(arg3), method.getParameters()[3].getType().cast(arg4), method.getParameters()[4].getType().cast(arg5));
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					throw new RuntimeException(String.format("unable to invoke method [name: %s]", e, methodName));
+				}
+			}
+		}
+		throw new RuntimeException(String.format("unable to invoke method [name: %s]", methodName));
+	}
+
+
+	public static Artifact createArtifact(File artifactFile) {
+		Artifact artifact = Mockito.mock(Artifact.class);
+		Mockito.when(artifact.getGroupId()).thenReturn("groupId");
+		Mockito.when(artifact.getArtifactId()).thenReturn("artifactId");
+		Mockito.when(artifact.getVersion()).thenReturn("0.8.15");
+		Mockito.when(artifact.getFile()).thenReturn(artifactFile);
+		Mockito.when(artifact.getScope()).thenReturn("compile");
+		return artifact;
+	}
+
+
+	public static Artifact createArtifact() {
+		File artifactFile = Mockito.mock(File.class);
+		Mockito.when(artifactFile.getName()).thenReturn("filename.ext");
+		return createArtifact(artifactFile);
 	}
 }

@@ -7,11 +7,13 @@ public class GenerationResource {
 	private final String identifier;
 	private final DefaultConfiguration defaultConfiguration;
 	private final Resource resourceConfiguration;
+	private final String dependencyScope;
 	private String filename;
 	private String version;
 
 
 	public GenerationResource(Artifact artifact, DefaultConfiguration configuration, Resource resourceConfiguration) {
+		this.dependencyScope = artifact.getScope();
 		this.defaultConfiguration = configuration;
 		this.resourceConfiguration = resourceConfiguration;
 		identifier = String.format("%s:%s", artifact.getGroupId(), artifact.getArtifactId());
@@ -31,6 +33,11 @@ public class GenerationResource {
 
 	public Resource getResourceConfiguration() {
 		return resourceConfiguration;
+	}
+
+
+	public String getDependencyScope() {
+		return dependencyScope;
 	}
 
 
@@ -97,7 +104,7 @@ public class GenerationResource {
 
 	public String getResourceString(String component, boolean isWeb, boolean isIsolated) {
 		boolean allowed = false;
-		if ("".equals(filename) && resourceConfiguration != null && resourceConfiguration.getPath() == null) {
+		if ("".equals(filename) && (resourceConfiguration == null || resourceConfiguration.getPath() == null)) {
 			allowed = false;
 		} else if (!isIsolated && resourceConfiguration != null && resourceConfiguration.isExluded()) {
 			allowed = false;
@@ -107,9 +114,17 @@ public class GenerationResource {
 			allowed = defaultConfiguration.getComponents().contains(component);
 		}
 		if (allowed) {
-			return String.format("<resource name=\"%s\"%s%s%s%s%s>%s%s</resource>%n", identifier, getScope(isWeb), getIsolated(isWeb, isIsolated), getVersion(), getMinVersion(), getMaxVersion(), getPath(), filename);
+			return getResourceString(isWeb, isIsolated);
 		}
 		return null;
+	}
+
+
+	public String getResourceString(boolean isWeb, boolean isIsolated) {
+		if ("".equals(filename) && (resourceConfiguration == null || resourceConfiguration.getPath() == null)) {
+			return null;
+		}
+		return String.format("<resource name=\"%s\"%s%s%s%s%s>%s%s</resource>%n", identifier, getScope(isWeb), getIsolated(isWeb, isIsolated), getVersion(), getMinVersion(), getMaxVersion(), getPath(), filename);
 	}
 
 
@@ -131,21 +146,5 @@ public class GenerationResource {
 	@Override
 	public String toString() {
 		return String.format("resource [identifier: %s, scope: %s, isolated: %s, version: %s, path: %s, filename:%s]", identifier, getScope(false), getIsolated(false, false), getVersion(), getPath(), filename);
-	}
-
-
-	public void merge(GenerationResource resource) throws DifferenScopeException {
-		if (!this.equals(resource)) {
-			throw new NotMergableException(String.format("resources with different identifiers not mergable [identifier1: %s, identifier2: %s]", identifier, resource.identifier));
-		}
-		if (!resourceConfiguration.getComponents().equals(resource.getResourceConfiguration().getComponents())) {
-			resourceConfiguration.getComponents().addAll(resource.getResourceConfiguration().getComponents());
-		}
-		if (!resourceConfiguration.getScope().equals(resource.getResourceConfiguration().getScope())) {
-			if (!"server".equals(resourceConfiguration.getScope())) {
-				resourceConfiguration.setScope(resource.getResourceConfiguration().getScope());
-			}
-			throw new DifferenScopeException(String.format("resource-scope changed [%s, %s]", resourceConfiguration, resource.getResourceConfiguration()));
-		}
 	}
 }

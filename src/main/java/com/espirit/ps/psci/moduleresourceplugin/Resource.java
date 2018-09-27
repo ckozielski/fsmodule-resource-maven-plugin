@@ -20,7 +20,7 @@ public class Resource {
 	private Boolean isolated;
 
 	@Parameter
-	private boolean exclude;
+	private Boolean exclude;
 
 	@Parameter
 	private String path;
@@ -90,7 +90,7 @@ public class Resource {
 
 
 	public boolean isExluded() {
-		return exclude;
+		return exclude != null && exclude;
 	}
 
 
@@ -111,6 +111,6 @@ public class Resource {
 
 	@Override
 	public String toString() {
-		return String.format("resource [identifier: %s, scope: %s, components: %s, exclude: %s, path: %s, minVersion: %s, maxVersion: %s]", identifier, scope, components, exclude, path, minVersion, maxVersion);
+		return String.format("resource [identifier: %s, scope: %s, components: %s, exclude: %s, path: %s, minVersion: %s, maxVersion: %s]", identifier, scope, components, isExluded(), path, minVersion, maxVersion);
 	}
 }

@@ -1,6 +1,5 @@
 package com.espirit.ps.psci.moduleresourceplugin;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -29,6 +28,8 @@ import org.apache.maven.shared.dependency.graph.traversal.CollectingDependencyNo
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.PROCESS_RESOURCES, aggregator = false, executionStrategy = "always", requiresOnline = true,
 	requiresProject = true, threadSafe = false)
 public class GenerateModule extends AbstractMojo {
+
+	private static final String RESOURCES2 = "resources";
 
 	/**
 	 * The current maven project.
@@ -112,6 +113,11 @@ public class GenerateModule extends AbstractMojo {
 
 	protected static Map<String, String> createEmptyResources(Set<String> components) {
 		Map<String, String> emptyValues = new TreeMap<>();
+
+		emptyValues.put(RESOURCES2, "");
+		emptyValues.put("resourcesModule", "");
+		emptyValues.put("resourcesRuntime", "");
+
 		for (String component : components) {
 			String legacyComponent = String.format("%s.legacy", component);
 			emptyValues.put(legacyComponent, "");
@@ -129,12 +135,13 @@ public class GenerateModule extends AbstractMojo {
 	private void fillResources(Set<String> components, Map<String, String> values) throws MojoExecutionException {
 		try {
 			for (String component : components) {
-				List<GenerationResource> collectedResources = getResources();
+				Set<GenerationResource> collectedResources = getResources();
 				for (GenerationResource resource : collectedResources) {
 					processResource(resource, component, values, false, false);
 					processResource(resource, component, values, false, true);
 					processResource(resource, component, values, true, false);
 					processResource(resource, component, values, true, true);
+					processOldResource(resource, values);
 				}
 			}
 		} catch (DependencyGraphBuilderException e) {
@@ -143,8 +150,8 @@ public class GenerateModule extends AbstractMojo {
 	}
 
 
-	private List<GenerationResource> getResources() throws DependencyGraphBuilderException, MojoExecutionException {
-		List<GenerationResource> modulResources = new ArrayList<>();
+	private Set<GenerationResource> getResources() throws DependencyGraphBuilderException, MojoExecutionException {
+		Set<GenerationResource> modulResources = new HashSet<>();
 		final ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(this.session.getProjectBuildingRequest());
 		buildingRequest.setProject(this.project);
 
@@ -172,7 +179,7 @@ public class GenerateModule extends AbstractMojo {
 	}
 
 
-	private void processDependency(List<GenerationResource> modulResources, Resource configuration, DependencyNode childDependencyNode) throws MojoExecutionException {
+	private void processDependency(Set<GenerationResource> modulResources, Resource configuration, DependencyNode childDependencyNode) throws MojoExecutionException {
 		Artifact artifact = childDependencyNode.getArtifact();
 
 		if ("provided".equals(artifact.getScope()) || "test".equals(artifact.getScope())) {
@@ -184,37 +191,45 @@ public class GenerateModule extends AbstractMojo {
 			childConfiguration = configuration;
 		}
 
-		GenerationResource resource = new GenerationResource(artifact, defaultConfiguration, childConfiguration);
-		if (!modulResources.contains(resource)) {
-			modulResources.add(resource);
-			return;
-		}
+		modulResources.add(new GenerationResource(artifact, defaultConfiguration, childConfiguration));
+	}
 
-		GenerationResource generationResource = modulResources.get(modulResources.indexOf(resource));
-		try {
-			generationResource.merge(resource);
-		} catch (DifferenScopeException e) {
-			this.getLog().warn(e.getMessage(), e);
-		} catch (Exception e) {
-			throw new MojoExecutionException("error while collecting dependencies", e);
+
+	private void processResource(GenerationResource resource, String component, Map<String, String> values, Boolean isWeb, Boolean isIsolated) {
+		String resourceString = resource.getResourceString(component, isWeb, isIsolated);
+		if (resourceString != null) {
+			String componentKey;
+			if (isWeb) {
+				if (isIsolated) {
+					componentKey = String.format("%s.isolated.web", component);
+				} else {
+					componentKey = String.format("%s.legacy.web", component);
+				}
+			} else {
+				if (isIsolated) {
+					componentKey = String.format("%s.isolated", component);
+				} else {
+					componentKey = String.format("%s.legacy", component);
+				}
+			}
+			values.put(componentKey, values.get(componentKey) + resourceString);
 		}
 	}
 
 
-	private void processResource(GenerationResource resource, String component, Map<String, String> values, boolean isWeb, boolean isIsolated) {
-		String resourceString = resource.getResourceString(component, isWeb, isIsolated);
-		if (resourceString != null) {
-			String componentKey;
-			if (isWeb && isIsolated) {
-				componentKey = String.format("%s.isolated.web", component);
-			} else if (isWeb && !isIsolated) {
-				componentKey = String.format("%s.legacy.web", component);
-			} else if (!isWeb && isIsolated) {
-				componentKey = String.format("%s.isolated", component);
-			} else {
-				componentKey = String.format("%s.legacy", component);
-			}
-			values.put(componentKey, values.get(componentKey) + resourceString);
+	private void processOldResource(GenerationResource resource, Map<String, String> values) {
+		String resourceString = resource.getResourceString(true, false);
+		if (resourceString == null) {
+			return;
+		}
+		switch (resource.getDependencyScope()) {
+			case "compile":
+				values.put(RESOURCES2, values.get(RESOURCES2) + resourceString);
+				values.put("resourcesModule", values.get("resourcesModule") + resourceString);
+				break;
+			case "runtime":
+				values.put("resourcesRuntime", values.get("resourcesRuntime") + resourceString);
+				break;
 		}
 	}
 

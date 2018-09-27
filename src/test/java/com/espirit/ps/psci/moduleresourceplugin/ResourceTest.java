@@ -71,4 +71,28 @@ public class ResourceTest {
 		Resource resourceConfiguration = new Resource();
 		Assert.assertEquals("resource [identifier: null, scope: null, components: null, exclude: false, path: null, minVersion: null, maxVersion: null]", resourceConfiguration.toString());
 	}
+
+
+	@Test
+	public void hashCodeTest() {
+		Resource resourceConfiguration = new Resource();
+		TestHelper.injectToPrivateField(resourceConfiguration, "identifier", "groupId:artifactId");
+		Assert.assertEquals("groupId:artifactId".hashCode(), resourceConfiguration.hashCode());
+	}
+
+
+	@Test
+	public void equalsTest() {
+		Resource resourceConfiguration = new Resource();
+		TestHelper.injectToPrivateField(resourceConfiguration, "identifier", "groupId:artifactId");
+		Assert.assertFalse(resourceConfiguration.equals(this));
+
+		Resource resourceConfiguration2 = new Resource();
+		TestHelper.injectToPrivateField(resourceConfiguration2, "identifier", "groupId2:artifactId2");
+		Assert.assertFalse(resourceConfiguration.equals(resourceConfiguration2));
+
+		Resource resourceConfiguration3 = new Resource();
+		TestHelper.injectToPrivateField(resourceConfiguration3, "identifier", "groupId:artifactId");
+		Assert.assertTrue(resourceConfiguration.equals(resourceConfiguration3));
+	}
 }
