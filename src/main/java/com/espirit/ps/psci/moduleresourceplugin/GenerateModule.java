@@ -29,7 +29,11 @@ import org.apache.maven.shared.dependency.graph.traversal.CollectingDependencyNo
 	requiresProject = true, threadSafe = false)
 public class GenerateModule extends AbstractMojo {
 
-	private static final String RESOURCES2 = "resources";
+	private static final String VAR_NAME_RESOURCES_RUNTIME = "resourcesRuntime";
+
+	private static final String VAR_NAME_RESOURCES_MODULE = "resourcesModule";
+
+	private static final String VAR_NAME_RESOURCES = "resources";
 
 	/**
 	 * The current maven project.
@@ -114,9 +118,9 @@ public class GenerateModule extends AbstractMojo {
 	protected static Map<String, String> createEmptyResources(Set<String> components) {
 		Map<String, String> emptyValues = new TreeMap<>();
 
-		emptyValues.put(RESOURCES2, "");
-		emptyValues.put("resourcesModule", "");
-		emptyValues.put("resourcesRuntime", "");
+		emptyValues.put(VAR_NAME_RESOURCES, "");
+		emptyValues.put(VAR_NAME_RESOURCES_MODULE, "");
+		emptyValues.put(VAR_NAME_RESOURCES_RUNTIME, "");
 
 		for (String component : components) {
 			String legacyComponent = String.format("%s.legacy", component);
@@ -150,7 +154,7 @@ public class GenerateModule extends AbstractMojo {
 	}
 
 
-	private Set<GenerationResource> getResources() throws DependencyGraphBuilderException, MojoExecutionException {
+	private Set<GenerationResource> getResources() throws DependencyGraphBuilderException {
 		Set<GenerationResource> modulResources = new HashSet<>();
 		final ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(this.session.getProjectBuildingRequest());
 		buildingRequest.setProject(this.project);
@@ -179,7 +183,7 @@ public class GenerateModule extends AbstractMojo {
 	}
 
 
-	private void processDependency(Set<GenerationResource> modulResources, Resource configuration, DependencyNode childDependencyNode) throws MojoExecutionException {
+	private void processDependency(Set<GenerationResource> modulResources, Resource configuration, DependencyNode childDependencyNode) {
 		Artifact artifact = childDependencyNode.getArtifact();
 
 		if ("provided".equals(artifact.getScope()) || "test".equals(artifact.getScope())) {
@@ -222,14 +226,11 @@ public class GenerateModule extends AbstractMojo {
 		if (resourceString == null) {
 			return;
 		}
-		switch (resource.getDependencyScope()) {
-			case "compile":
-				values.put(RESOURCES2, values.get(RESOURCES2) + resourceString);
-				values.put("resourcesModule", values.get("resourcesModule") + resourceString);
-				break;
-			case "runtime":
-				values.put("resourcesRuntime", values.get("resourcesRuntime") + resourceString);
-				break;
+		if ("compile".equals(resource.getDependencyScope())) {
+			values.put(VAR_NAME_RESOURCES, values.get(VAR_NAME_RESOURCES) + resourceString);
+			values.put(VAR_NAME_RESOURCES_MODULE, values.get(VAR_NAME_RESOURCES_MODULE) + resourceString);
+		} else if ("runtime".equals(resource.getDependencyScope())) {
+			values.put(VAR_NAME_RESOURCES_RUNTIME, values.get(VAR_NAME_RESOURCES_RUNTIME) + resourceString);
 		}
 	}
 
