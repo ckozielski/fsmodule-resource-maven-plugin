@@ -31,6 +31,7 @@ Abhängigkeiten, die als exluded markiert sind, werden nicht ausgegeben.
 Abhängigkeiten, die als exluded markiert sind, werden ausgegeben. Das Attribute "isolated" wird ausgegeben, wenn die Abhängigkeit entsprechend markiert wurde.
 * **module.resources.[component].isolated.web**
 Abhängigkeiten, die als exluded markiert sind, werden ausgegeben.
+
 ### resources -> resource
     <resources>
         ...
@@ -101,3 +102,4 @@ Angabe der Maximalen-Version in der diese Abhängigkeit von dem Modul genutzt we
 		</executions>
 	</plugin>
 ## Einschränkungen
+Sollte eine Transitive Abhängigkeit bei 2 oder mehr Abhängigkeiten mit unterschiedlichen Konfigurationen benötigt werden, so muss für diese eine eigene Konfiguration angelegt werden, die für alle Ihre aufrufenden Abhängigkeiten gültig ist.
