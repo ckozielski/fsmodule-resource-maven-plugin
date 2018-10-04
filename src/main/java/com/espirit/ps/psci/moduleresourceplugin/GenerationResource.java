@@ -46,7 +46,7 @@ public class GenerationResource {
 	}
 
 
-	private String getIsolated(Boolean isWeb, Boolean isIsolated) {
+	private String getMode(Boolean isWeb, Boolean isIsolated) {
 		if (isWeb || !isIsolated) {
 			return "";
 		}
@@ -56,7 +56,7 @@ public class GenerationResource {
 		} else {
 			isolated = defaultConfiguration.isIsolated();
 		}
-		return String.format(" isolated=\"%s\"", isolated);
+		return String.format(" mode=\"%s\"", isolated ? "isolated" : "legacy");
 	}
 
 
@@ -124,7 +124,7 @@ public class GenerationResource {
 		if ("".equals(filename) && (resourceConfiguration == null || resourceConfiguration.getPath() == null)) {
 			return null;
 		}
-		return String.format("<resource name=\"%s\"%s%s%s%s%s>%s%s</resource>%n", identifier, getScope(isWeb), getIsolated(isWeb, isIsolated), getVersion(), getMinVersion(), getMaxVersion(), getPath(), filename);
+		return String.format("<resource name=\"%s\"%s%s%s%s%s>%s%s</resource>%n", identifier, getScope(isWeb), getMode(isWeb, isIsolated), getVersion(), getMinVersion(), getMaxVersion(), getPath(), filename);
 	}
 
 
@@ -145,6 +145,6 @@ public class GenerationResource {
 
 	@Override
 	public String toString() {
-		return String.format("resource [identifier: %s, scope: %s, isolated: %s, version: %s, path: %s, filename:%s]", identifier, getScope(false), getIsolated(false, false), getVersion(), getPath(), filename);
+		return String.format("resource [identifier: %s, scope: %s, isolated: %s, version: %s, path: %s, filename:%s]", identifier, getScope(false), getMode(false, false), getVersion(), getPath(), filename);
 	}
 }

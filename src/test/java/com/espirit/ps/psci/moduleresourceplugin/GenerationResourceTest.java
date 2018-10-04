@@ -46,13 +46,13 @@ public class GenerationResourceTest {
 
 		resource = new GenerationResource(TestHelper.createArtifact(), new DefaultConfiguration(), null);
 		Assert.assertEquals(String.format("<resource name=\"groupId:artifactId\" scope=\"module\" version=\"0.8.15\" minVersion=\"0.8.15\">lib/filename.ext</resource>%n"), resource.getResourceString("global", false, false));
-		Assert.assertEquals(String.format("<resource name=\"groupId:artifactId\" scope=\"module\" isolated=\"true\" version=\"0.8.15\" minVersion=\"0.8.15\">lib/filename.ext</resource>%n"), resource.getResourceString("global", false, true));
+		Assert.assertEquals(String.format("<resource name=\"groupId:artifactId\" scope=\"module\" mode=\"isolated\" version=\"0.8.15\" minVersion=\"0.8.15\">lib/filename.ext</resource>%n"), resource.getResourceString("global", false, true));
 
 		resourceConfiguration = new Resource();
 		TestHelper.injectToPrivateField(resourceConfiguration, "exclude", Boolean.TRUE);
 		resource = new GenerationResource(TestHelper.createArtifact(), new DefaultConfiguration(), resourceConfiguration);
 		Assert.assertNull(resource.getResourceString("global", false, false));
-		Assert.assertEquals(String.format("<resource name=\"groupId:artifactId\" scope=\"module\" isolated=\"true\" version=\"0.8.15\" minVersion=\"0.8.15\">lib/filename.ext</resource>%n"), resource.getResourceString("global", false, true));
+		Assert.assertEquals(String.format("<resource name=\"groupId:artifactId\" scope=\"module\" mode=\"isolated\" version=\"0.8.15\" minVersion=\"0.8.15\">lib/filename.ext</resource>%n"), resource.getResourceString("global", false, true));
 		Assert.assertNull(resource.getResourceString("global", true, false));
 		Assert.assertEquals(String.format("<resource name=\"groupId:artifactId\" version=\"0.8.15\" minVersion=\"0.8.15\">lib/filename.ext</resource>%n"), resource.getResourceString("global", true, true));
 
@@ -103,19 +103,23 @@ public class GenerationResourceTest {
 		GenerationResource resource;
 
 		resource = new GenerationResource(TestHelper.createArtifact(), new DefaultConfiguration(), null);
-		Assert.assertEquals(" isolated=\"true\"", TestHelper.invokePrivateMethod(resource, "getIsolated", Boolean.FALSE, Boolean.TRUE));
-		Assert.assertEquals("", TestHelper.invokePrivateMethod(resource, "getIsolated", Boolean.FALSE, Boolean.FALSE));
+		Assert.assertEquals(" mode=\"isolated\"", TestHelper.invokePrivateMethod(resource, "getMode", Boolean.FALSE, Boolean.TRUE));
+		Assert.assertEquals("", TestHelper.invokePrivateMethod(resource, "getMode", Boolean.FALSE, Boolean.FALSE));
 
 		Resource resourceConfiguration = new Resource();
 		resource = new GenerationResource(TestHelper.createArtifact(), new DefaultConfiguration(), resourceConfiguration);
-		Assert.assertEquals("", TestHelper.invokePrivateMethod(resource, "getIsolated", Boolean.TRUE, Boolean.TRUE));
-		Assert.assertEquals("", TestHelper.invokePrivateMethod(resource, "getIsolated", Boolean.TRUE, Boolean.FALSE));
-		Assert.assertEquals(" isolated=\"true\"", TestHelper.invokePrivateMethod(resource, "getIsolated", Boolean.FALSE, Boolean.TRUE));
-		Assert.assertEquals("", TestHelper.invokePrivateMethod(resource, "getIsolated", Boolean.FALSE, Boolean.FALSE));
+		Assert.assertEquals("", TestHelper.invokePrivateMethod(resource, "getMode", Boolean.TRUE, Boolean.TRUE));
+		Assert.assertEquals("", TestHelper.invokePrivateMethod(resource, "getMode", Boolean.TRUE, Boolean.FALSE));
+		Assert.assertEquals(" mode=\"isolated\"", TestHelper.invokePrivateMethod(resource, "getMode", Boolean.FALSE, Boolean.TRUE));
+		Assert.assertEquals("", TestHelper.invokePrivateMethod(resource, "getMode", Boolean.FALSE, Boolean.FALSE));
 
 		TestHelper.injectToPrivateField(resourceConfiguration, "isolated", true);
-		Assert.assertEquals(" isolated=\"true\"", TestHelper.invokePrivateMethod(resource, "getIsolated", Boolean.FALSE, Boolean.TRUE));
-		Assert.assertEquals("", TestHelper.invokePrivateMethod(resource, "getIsolated", Boolean.FALSE, Boolean.FALSE));
+		Assert.assertEquals(" mode=\"isolated\"", TestHelper.invokePrivateMethod(resource, "getMode", Boolean.FALSE, Boolean.TRUE));
+		Assert.assertEquals("", TestHelper.invokePrivateMethod(resource, "getMode", Boolean.FALSE, Boolean.FALSE));
+
+		TestHelper.injectToPrivateField(resourceConfiguration, "isolated", false);
+		Assert.assertEquals(" mode=\"legacy\"", TestHelper.invokePrivateMethod(resource, "getMode", Boolean.FALSE, Boolean.TRUE));
+		Assert.assertEquals("", TestHelper.invokePrivateMethod(resource, "getMode", Boolean.FALSE, Boolean.FALSE));
 	}
 
 
