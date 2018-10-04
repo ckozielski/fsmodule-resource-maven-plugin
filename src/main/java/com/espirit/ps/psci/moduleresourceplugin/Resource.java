@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.apache.maven.plugins.annotations.Parameter;
 
-public class Resource {
+public class Resource implements Cloneable {
 
 	@Parameter(required = true)
 	private String identifier;
@@ -112,5 +112,27 @@ public class Resource {
 	@Override
 	public String toString() {
 		return String.format("resource [identifier: %s, scope: %s, components: %s, exclude: %s, path: %s, minVersion: %s, maxVersion: %s]", identifier, scope, components, isExluded(), path, minVersion, maxVersion);
+	}
+
+
+	@Override
+	protected Resource clone() throws CloneNotSupportedException {
+		Resource clone = (Resource) super.clone();
+		if (this.componentSet != null) {
+			clone.componentSet = new HashSet<>(this.componentSet);
+		}
+		return clone;
+	}
+
+
+	public Resource copyForChild() {
+		try {
+			Resource copy = this.clone();
+			copy.minVersion = null;
+			copy.maxVersion = null;
+			return copy;
+		} catch (CloneNotSupportedException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 }

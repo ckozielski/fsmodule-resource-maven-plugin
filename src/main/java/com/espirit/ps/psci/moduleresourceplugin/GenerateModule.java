@@ -193,8 +193,8 @@ public class GenerateModule extends AbstractMojo {
 		}
 
 		Resource childConfiguration = getResourceConfiguration(artifact);
-		if (childConfiguration == null) {
-			childConfiguration = configuration;
+		if (childConfiguration == null && configuration != null) {
+			childConfiguration = configuration.copyForChild();
 		}
 
 		modulResources.add(new GenerationResource(artifact, defaultConfiguration, childConfiguration));
