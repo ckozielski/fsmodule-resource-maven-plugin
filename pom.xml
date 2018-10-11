@@ -209,4 +209,12 @@
 			</build>
 		</profile>
 	</profiles>
+	
+    <distributionManagement>
+        <repository>
+            <id>artifactory</id>
+            <name>artifactory</name>
+            <url>${artifactoryUrl}</url>
+        </repository>
+    </distributionManagement>
 </project>
