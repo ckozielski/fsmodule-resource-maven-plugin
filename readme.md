@@ -1,11 +1,18 @@
 # module-resource-plugin
-Das Plugin ermittelt alle im Projekt verwendeten Abhängigkeiten und bereite diese für eine Ausgabe in der modul.xml auf. Für unterschiedliche Resourcen können eigene Konfigurationen vorgenommen werden. Hierbei vererbt sich eine Konfiguration auch immer auf die transitiven Abhängigkeiten. Hier muss jedoch beachtet werden, das transitive Abhängigkeiten immer nur einmal in die Liste der Resourcen aufgenommen werden. Somit ist es z.B. nicht möglich diese an einerstelle im Scope "server" und an einer anderen Stelle im Scope "module" auszugeben.
-Die einzelnen Abhängigkeiten werden in sogenannten Komponenten gebündelt, wobei eine Abhängigkeit in unterschiedlichen Komponenten aufgelistet werden kann. Für jede Komponente werden 4 Ausgabevarianten (legacy, legacy.web, isolated, isolated.web) erzeugt.
-Gibt es für eine Abhängigkeit keine Konfiguration, so greift die angegebene default-Konfiguration bzw. die im Plugin hinterlegte.
-## Plugin-Konfiguration
-Das Plugin kann über das "configration"-TAG in der pom.xml konfiguriert werden. In der Konfiguration kann zum einen die default-Konfiguration als auch die Konfiguration für einzelne Abhängigkeiten angegeben werden.
+
+The plugin detects all dependencies used in the project and prepare them for output in the modul(-isolated).xml. Different configurations can be made for different resources. A configuration always inherits to the transitive dependencies. However, it should be noted that transitive dependencies are included only once in the list of resources. Thus, it is e.g. not possible to output them at one point in the scope "server" and at another point in the scope "module".
+
+The individual dependencies are bundled in so-called components, whereby a dependency can be listed in different components. For each component, 4 output variants (legacy, legacy.web, isolated, isolated.web) are generated.
+If there is no configuration for a dependency, the specified default configuration or the one stored in the plug-in will take effect.
+
+
+## plugin configuration
+
+The plugin can be configured via the _configration_ tag in the pom.xml. In the configuration, the default configuration as well as the configuration for individual dependencies can be specified.
+
 ### defaultConfiguration
-    <!-- entspricht der default-konfiguration, die über das plugin gesetzt wird -->
+
+    <!-- this example is exactly the same like the embedded configuration of the plugin. -->
 	<defaultConfiguration>
 		<scope>module</scope>
 		<components>global</components>
@@ -13,26 +20,38 @@ Das Plugin kann über das "configration"-TAG in der pom.xml konfiguriert werden.
 		<path>lib/</path>
 		<useDefaultMinVersion>true</useDefaultMinVersion>
 	</defaultConfiguration>
+
 #### scope
-Scope innerhalb des Firstspirit-Servers für die einzelnen Abhängigkeiten innerhalb des Moduls
+
+Defines the scope for the (transient) dependency used in the module definition.
+
 #### components
-Zuordnung der Abhängigkeiten zu einzelnen Komponenten innerhalb des Moduls. Pro Komponenten könnend die folgenden Varianten abgerufen werden. Die folgenden Attribute, sofern sie konfiguriert sind werden in allen Varianten erzeugt
+
+Assignment of dependencies to individual components within the module. For each component, the following variants can be retrieved. The following attributes, if configured, are generated in all variants:
+
 * name
 * version
 * minVersion
 * maxVersion
 
-Varianten und Unterschiede
+Variations and differences:
+
 * **module.resources.[component].legacy**
-Abhängigkeiten, die als exluded markiert sind, werden nicht ausgegeben. Es wird zusätzlich das Attribute "scope" ausgegeben.
+Dependencies marked as excluded will be not generated. In addition, the attribute _scope_ will be added.
+
+
 * **module.resources.[component].legacy.web**
-Abhängigkeiten, die als exluded markiert sind, werden nicht ausgegeben.
+Dependencies marked as excluded will be not generated.
+
 * **module.resources.[component].isolated**
-Abhängigkeiten, die als exluded markiert sind, werden ausgegeben. Das Attribute "isolated" wird ausgegeben, wenn die Abhängigkeit entsprechend markiert wurde.
+Dependencies marked as excluded will be generated. In addition, the attribute _isolated_ will be generated when the dependency is marked. 
+
 * **module.resources.[component].isolated.web**
-Abhängigkeiten, die als exluded markiert sind, werden ausgegeben.
+Dependencies marked as excluded will be generated.
+
 
 ### resources -> resource
+
     <resources>
         ...
         <resource>
@@ -47,24 +66,42 @@ Abhängigkeiten, die als exluded markiert sind, werden ausgegeben.
         </resource>
         ...
     </resources>
+
 #### identifier
-Der aus GroupId und ArtifactId zusammengesetzte Identifier für die angegebene Abhängig.
+
+The Maven GroupId and Artifactid identifier for the dependency separated by a colon (:). You must not define the version!
+
 #### scope
-Abweichender Scope innerhalb des Firstspirit-Servers für die Abhängigkeiten innerhalb des Moduls
+
+Different scope definition for the (transient) dependency used in the module definition.
+
 #### components
-Abweichende Komponenten, in denen die Abhängigkeit ausgegeben wird.
+
+Another definition for the components related to this dependency.
+
 #### isolated
-Gibt an, die diese Abhängigkeit über den Isolated Classloader geladen wird.
-#### exlude
-Unterdrückt die ausgabe der Abhängigkeit bei der "legacy" Ausgabe.
+
+Defines if the dependency will be loaded by the _isolated_ classloader of the _legacy_.
+
+#### exclude
+
+When _excluded_ the dependency will be not generated for the _legacy_ mode. 
+
 #### path
-Pfad zu JAR-Datei innerhalb des FSM.
-**HINWEIS: Hierdurch wird die Datei nicht an der entsprechenden Stelle im FSM gespeichert.**
+
+Path to the JAR file inside of the FSM bundle/file.
+**Attention: This will not copy the dependency to the right place at your FSM hierarchy.**
+
 #### minVersion
-Angabe der Minimal-Version in der diese Abhängigkeit benötigt wird. Überschreibt das Verhalten der "useDefaultMinVersion" aus der default-Konfiguration.
+
+Sets the minimal version definition for this dependency. This will overwrite the setting _useDefaultMinVersion_ from the _default_ configuration area.
+
 #### maxVersion
-Angabe der Maximalen-Version in der diese Abhängigkeit von dem Modul genutzt werden kann.
-## Beispielkonfiguration
+
+Sets the maximal version definition for this dependency.
+
+## Example
+
 	<plugin>
 		<groupId>com.espirit.ps.psci</groupId>
 		<artifactId>module-resource-plugin</artifactId>
@@ -101,5 +138,9 @@ Angabe der Maximalen-Version in der diese Abhängigkeit von dem Modul genutzt we
 			</execution>
 		</executions>
 	</plugin>
-## Einschränkungen
-Sollte eine Transitive Abhängigkeit bei 2 oder mehr Abhängigkeiten mit unterschiedlichen Konfigurationen benötigt werden, so muss für diese eine eigene Konfiguration angelegt werden, die für alle Ihre aufrufenden Abhängigkeiten gültig ist.
+
+
+
+## Limitations
+
+If a transitive dependency is required for two or more dependencies and this dependencies contains different configurations, a separate configuration has to be created for this transitive dependency which is valid for all your calling dependencies.
