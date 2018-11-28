@@ -230,7 +230,7 @@ public class GenerateModule extends AbstractMojo {
 		}
 		if ("compile".equals(resource.getDependencyScope())) {
 			values.put(VAR_NAME_RESOURCES, values.get(VAR_NAME_RESOURCES) + resourceString);
-			values.put(VAR_NAME_RESOURCES_MODULE, values.get(VAR_NAME_RESOURCES_MODULE) + resourceString);
+			values.put(VAR_NAME_RESOURCES_MODULE, values.get(VAR_NAME_RESOURCES_MODULE) + resource.getResourceString(false, false));
 		} else if ("runtime".equals(resource.getDependencyScope())) {
 			values.put(VAR_NAME_RESOURCES_RUNTIME, values.get(VAR_NAME_RESOURCES_RUNTIME) + resourceString);
 		}
