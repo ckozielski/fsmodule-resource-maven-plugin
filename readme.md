@@ -72,7 +72,7 @@ Angabe der Maximalen-Version in der diese Abhängigkeit von dem Modul genutzt we
 		<executions>
 			<execution>
 				<id>generate-module-resources</id>
-				<phase>process-resources</phase>
+				<phase>generate-resources</phase>
 				<goals>
 					<goal>generate</goal>
 				</goals>
